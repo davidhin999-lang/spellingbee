@@ -1263,6 +1263,37 @@ body.theme-hard {
   margin-bottom: 12px;
 }
 
+.go-lb-section {
+  background: linear-gradient(135deg, #f8f7ff, #f0ecff);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-top: 8px;
+}
+
+.go-lb-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.go-lb-rank {
+  font-size: 18px;
+  font-weight: 900;
+  color: #f59e0b;
+  margin-bottom: 10px;
+  animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+.lb-highlight {
+  background: rgba(250, 204, 21, 0.2) !important;
+  font-weight: 800;
+}
+
+.lb-highlight td {
+  color: #b45309 !important;
+}
+
 /* ==================== ROUND TRANSITION ==================== */
 .round-transition {
   position: absolute;

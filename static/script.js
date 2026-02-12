@@ -621,21 +621,48 @@ function renderLbTab(tab) {
   list.innerHTML = html;
 }
 
-function renderGameOverLeaderboard(board) {
+function renderGameOverLeaderboard(board, playerScore) {
   var container = document.getElementById("game-over-leaderboard");
-  if (!board || board.length === 0) { container.innerHTML = ""; return; }
+  if (!board || board.length === 0) {
+    container.innerHTML = '<div class="go-lb-section"><h3 class="go-lb-title">🏆 Leaderboard — ' + currentDifficulty.toUpperCase() + '</h3><p class="lb-empty">No scores yet.</p></div>';
+    return;
+  }
 
-  var entries = board.slice(0, 5);
-  var html = '<h3 class="lb-mini-title">Top 5 — ' + currentDifficulty.toUpperCase() + '</h3>';
-  html += '<table class="lb-table lb-mini"><thead><tr><th>#</th><th>Name</th><th>Score</th></tr></thead><tbody>';
+  var entries = board.slice(0, 10);
+  var userRank = -1;
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].name === playerName && entries[i].score === playerScore) { userRank = i + 1; break; }
+  }
+
+  var html = '<div class="go-lb-section">';
+  html += '<h3 class="go-lb-title">🏆 Leaderboard — ' + currentDifficulty.toUpperCase() + '</h3>';
+  if (userRank > 0) {
+    var medals = ["🥇", "🥈", "🥉"];
+    var rankText = userRank <= 3 ? medals[userRank - 1] + " " : "";
+    html += '<div class="go-lb-rank">' + rankText + 'You placed #' + userRank + '!</div>';
+  }
+  html += '<table class="lb-table lb-mini"><thead><tr><th>#</th><th>Name</th><th>Score</th><th>Streak</th></tr></thead><tbody>';
   var medals = ["🥇", "🥈", "🥉"];
   entries.forEach(function(e, i) {
     var rank = i < 3 ? medals[i] : (i + 1);
-    var highlight = (e.name === playerName && e.score === score) ? ' class="lb-highlight"' : '';
-    html += '<tr' + highlight + '><td>' + rank + '</td><td>' + escapeHtml(e.name) + '</td><td>' + e.score + '</td></tr>';
+    var isUser = (e.name === playerName && e.score === playerScore);
+    var highlight = isUser ? ' class="lb-highlight"' : '';
+    html += '<tr' + highlight + '><td>' + rank + '</td><td>' + escapeHtml(e.name) + '</td><td>' + e.score + '</td><td>' + (e.streak || 0) + '</td></tr>';
   });
-  html += '</tbody></table>';
+  html += '</tbody></table></div>';
   container.innerHTML = html;
+}
+
+function fetchAndShowGameOverLeaderboard(playerScore) {
+  fetch("/leaderboard")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var board = data[currentDifficulty] || [];
+      renderGameOverLeaderboard(board, playerScore);
+    })
+    .catch(function(err) {
+      console.error("Game over leaderboard fetch error:", err);
+    });
 }
 
 function escapeHtml(str) {
@@ -696,36 +723,30 @@ function endGame() {
     });
   } else { section.classList.add("hidden"); }
 
-  // Submit score to leaderboard
-  if (playerName && score > 0) {
+  // Submit score to leaderboard, then fetch and display full board
+  var finalScore = score;
+  document.getElementById("final-rank").classList.add("hidden");
+  document.getElementById("game-over-leaderboard").innerHTML = "";
+
+  if (playerName && finalScore > 0) {
     fetch("/leaderboard", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: playerName, score: score, difficulty: currentDifficulty, streak: bestStreak })
+      body: JSON.stringify({ name: playerName, score: finalScore, difficulty: currentDifficulty, streak: bestStreak })
     })
       .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data.board) {
-          renderGameOverLeaderboard(data.board);
-          // Show rank
-          var rank = -1;
-          for (var i = 0; i < data.board.length; i++) {
-            if (data.board[i].name === playerName && data.board[i].score === score) { rank = i + 1; break; }
-          }
-          var rankEl = document.getElementById("final-rank");
-          if (rank > 0 && rank <= 3) {
-            var medals = ["🥇", "🥈", "🥉"];
-            rankEl.textContent = medals[rank - 1] + " #" + rank + " on the leaderboard!";
-            rankEl.classList.remove("hidden");
-          } else if (rank > 0) {
-            rankEl.textContent = "#" + rank + " on the leaderboard";
-            rankEl.classList.remove("hidden");
-          } else {
-            rankEl.classList.add("hidden");
-          }
-        }
+      .then(function() {
+        // After saving, fetch the full leaderboard to show rankings
+        fetchAndShowGameOverLeaderboard(finalScore);
       })
-      .catch(function(err) { console.error("Score submit error:", err); });
+      .catch(function(err) {
+        console.error("Score submit error:", err);
+        // Still try to show leaderboard even if submit failed
+        fetchAndShowGameOverLeaderboard(finalScore);
+      });
+  } else {
+    // No score to submit, just show existing leaderboard
+    fetchAndShowGameOverLeaderboard(finalScore);
   }
 
   showScreen("game-over-screen");
