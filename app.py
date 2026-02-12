@@ -12,17 +12,20 @@ from words import EASY_WORDS, MEDIUM_WORDS, HARD_WORDS, PHRASE_WORDS, WORD_IMAGE
 app = Flask(__name__)
 
 # Initialize Firebase
-firebase_creds = os.environ.get("FIREBASE_CREDENTIALS")
-if firebase_creds:
-    cred_dict = json.loads(firebase_creds)
-    cred = credentials.Certificate(cred_dict)
-else:
-    # Local development: use the JSON file
-    cred_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
-    cred = credentials.Certificate(cred_path)
-
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+db = None
+firebase_error = None
+try:
+    firebase_creds = os.environ.get("FIREBASE_CREDENTIALS")
+    if firebase_creds:
+        cred_dict = json.loads(firebase_creds)
+        cred = credentials.Certificate(cred_dict)
+    else:
+        cred_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
+        cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+except Exception as e:
+    firebase_error = str(e)
 
 VOICE_NORMAL = "en-US-JennyNeural"
 VOICE_SLOW = "en-US-JennyNeural"
@@ -74,6 +77,8 @@ def fetch_image_url(word):
 
 def load_leaderboard():
     board = {"easy": [], "medium": [], "hard": []}
+    if not db:
+        return board
     try:
         for diff in board:
             docs = db.collection("leaderboard").document(diff).collection("entries").stream()
@@ -86,10 +91,23 @@ def load_leaderboard():
 
 
 def save_leaderboard_entry(difficulty, entry):
+    if not db:
+        return
     try:
         db.collection("leaderboard").document(difficulty).collection("entries").add(entry)
     except Exception as e:
         print("Firestore save error:", e)
+
+
+@app.route("/debug")
+def debug():
+    has_env = bool(os.environ.get("FIREBASE_CREDENTIALS"))
+    return jsonify({
+        "firebase_connected": db is not None,
+        "firebase_error": firebase_error,
+        "has_env_var": has_env,
+        "env_var_length": len(os.environ.get("FIREBASE_CREDENTIALS", ""))
+    })
 
 
 @app.route("/")
