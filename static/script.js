@@ -569,13 +569,15 @@ function showLeaderboard() {
   fetch("/leaderboard")
     .then(function(res) { return res.json(); })
     .then(function(data) {
+      console.log("Leaderboard data:", data);
       leaderboardData = data;
       currentLbTab = "easy";
       renderLbTab("easy");
       updateLbTabButtons();
       document.getElementById("leaderboard-modal").classList.remove("hidden");
     })
-    .catch(function() {
+    .catch(function(err) {
+      console.error("Leaderboard fetch error:", err);
       document.getElementById("leaderboard-modal").classList.remove("hidden");
     });
 }
@@ -723,7 +725,7 @@ function endGame() {
           }
         }
       })
-      .catch(function() {});
+      .catch(function(err) { console.error("Score submit error:", err); });
   }
 
   showScreen("game-over-screen");
