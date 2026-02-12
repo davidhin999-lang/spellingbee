@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spelling Bee</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+</head>
+<body>
+
+<div class="game-frame">
+
+  <button class="sound-btn">🔊</button>
+
+  <h1 class="title">Spelling Bee</h1>
+
+  <div class="menu-buttons">
+    <button onclick="startGame('easy')" class="menu-btn">Easy</button>
+    <button onclick="startGame('hard')" class="menu-btn">Hard</button>
+    <button onclick="startGame('review')" class="menu-btn">Review</button>
+  </div>
+
+  <div class="info-icon">ℹ</div>
+
+</div>
+
+<script>
+function startGame(mode) {
+    window.location.href = "/game?mode=" + mode;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "easy": [
+    {
+      "name": "TestKarina",
+      "score": 699,
+      "streak": 3
+    },
+    {
+      "name": "TestUser",
+      "score": 5,
+      "streak": 3
+    }
+  ],
+  "medium": [
+    {
+      "name": "TestKarina",
+      "score": 3,
+      "streak": 3
+    },
+    {
+      "name": "Dave",
+      "score": 1,
+      "streak": 1
+    }
+  ],
+  "hard": [
+    {
+      "name": "TestUser",
+      "score": 918,
+      "streak": 6
+    },
+    {
+      "name": "TestKarina",
+      "score": 289,
+      "streak": 2
+    },
+    {
+      "name": "TestKarina",
+      "score": 9,
+      "streak": 2
+    },
+    {
+      "name": "Dave",
+      "score": 3,
+      "streak": 3
+    },
+    {
+      "name": "Dave",
+      "score": 2,
+      "streak": 1
+    },
+    {
+      "name": "Dave",
+      "score": 2,
+      "streak": 2
+    }
+  ]
+}

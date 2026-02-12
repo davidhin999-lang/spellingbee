@@ -1,0 +1,133 @@
+# ==================== SPELLING BEE CONTEST WORDS ====================
+# Split into 3 difficulty tiers by word length and complexity
+
+EASY_WORDS = [
+    "queue", "email", "autumn", "minute", "castle",
+    "doctor", "family", "bakery", "centre", "believe",
+    "airport", "camping", "already", "foreign", "further",
+    "library", "luggage", "address", "biscuit", "business",
+    "grateful", "freezing", "features", "headache", "medicine",
+    "accident", "ambitious", "ambulance", "animation", "adventure",
+    "agreement", "attention", "authority", "beautiful", "beginning",
+    "challenge", "character", "chocolate", "certainly", "confusing",
+    "correctly", "dangerous", "decisions", "delicious", "desserts",
+    "education", "equipment", "eternity", "excellent", "expensive",
+    "following", "furniture", "geography", "knowledge", "languages",
+    "lightning", "marathon", "necessary", "opposite", "sentences",
+    "stressful", "thrilling", "toothache", "wednesday", "excellent",
+    "involving", "acquiring", "applying", "paperless", "terrifying",
+    "contained", "corkscrew", "extremely", "hopefully", "sightseeing",
+    "throughout", "vegetables", "vocabulary", "girlfriend", "headphones",
+]
+
+MEDIUM_WORDS = [
+    "achieving", "apparently", "appreciate", "belongings", "beautifully",
+    "businessman", "catastrophic", "championship", "cheesecake", "chinatown",
+    "colleagues", "combination", "comfortable", "commitment", "comparative",
+    "competition", "completely", "conditions", "containing", "countryside",
+    "definition", "difference", "distraction", "earthquake", "employment",
+    "expression", "experience", "exhibition", "excitement", "facilities",
+    "hardworking", "harmonious", "housewares", "imagination", "immigration",
+    "importance", "indirectly", "interesting", "introducing", "jewellery",
+    "kilometre", "literature", "management", "medication", "monitoring",
+    "mountainous", "mischievous", "modernization", "phenomenon", "philosophy",
+    "politician", "possessions", "potentially", "predictions", "rainforest",
+    "ridiculous", "salesperson", "snorkeling", "statements", "stomachache",
+    "strawberry", "suggestions", "technician", "technology", "temperature",
+    "university", "unstoppable", "windsurfing", "workaholic", "application",
+    "appointment", "advertising", "aeroplane", "afterwards", "alcoholism",
+    "arrangements", "association", "availability", "civilization", "documentary",
+    "exploration", "information", "kitesurfing", "linguistics", "paragliding",
+    "questioning", "romanticism", "satisfaction", "screwdriver", "significance",
+]
+
+HARD_WORDS = [
+    "accomplishments", "achievements", "acknowledgement", "administration",
+    "advertisement", "appreciation", "apprehensive", "appropriate",
+    "architecture", "astronomical", "communication", "comprehension",
+    "comprehensive", "circumstances", "consciously", "consecutively",
+    "consideration", "consolidation", "courageously", "continuously",
+    "dermatologist", "descriptions", "disappointing", "distribution",
+    "economically", "effectiveness", "encyclopedia", "engineering",
+    "entertainment", "enthusiastic", "equality", "examination",
+    "extraordinary", "independently", "international", "internationally",
+    "interruption", "investigation", "neighborhood", "nevertheless",
+    "overwhelming", "participles", "possibilities", "prescription",
+    "presentations", "refrigerator", "relationship", "resolutions",
+    "revolutionary", "scientifically", "successfully", "surprisingly",
+    "transnational", "understandable", "understanding", "unforgettable",
+    "hypervitaminosis", "hyperthyroidism", "hypertension", "mediterranean",
+    "methodology", "effectiveness", "independently", "internationally",
+]
+
+# Multi-word phrases (handled specially — spaces shown as gaps)
+PHRASE_WORDS = [
+    "food court", "ice hockey", "computer room", "movie theater",
+    "shopping bag", "shopping center", "bottle opener", "bungee jumping",
+    "chopping board", "microwave oven", "household chores", "united states",
+    "washing machine", "weekly planner", "wooden spoon", "admiration mark",
+]
+
+WORD_IMAGES = {
+    # EASY
+    "queue": "🚶‍♂️", "email": "📧", "autumn": "🍂", "minute": "⏱️", "castle": "🏰",
+    "doctor": "👨‍⚕️", "family": "👨‍👩‍👧‍👦", "bakery": "🧁", "centre": "🏢", "believe": "🙏",
+    "airport": "✈️", "camping": "⛺", "already": "⏰", "foreign": "🌍", "further": "➡️",
+    "library": "📚", "luggage": "🧳", "address": "📬", "biscuit": "🍪", "business": "💼",
+    "grateful": "🤗", "freezing": "🥶", "features": "⭐", "headache": "🤕", "medicine": "💊",
+    "accident": "🚗", "ambitious": "🚀", "ambulance": "🚑", "animation": "🎬", "adventure": "🗺️",
+    "agreement": "🤝", "attention": "👀", "authority": "👮", "beautiful": "🌸", "beginning": "🌅",
+    "challenge": "💪", "character": "🎭", "chocolate": "🍫", "certainly": "✅", "confusing": "😵",
+    "correctly": "✔️", "dangerous": "⚠️", "decisions": "🤔", "delicious": "😋", "desserts": "🍰",
+    "education": "🎓", "equipment": "🔧", "eternity": "♾️", "excellent": "🏅", "expensive": "💎",
+    "following": "👣", "furniture": "🛋️", "geography": "🌍", "knowledge": "🧠", "languages": "🗣️",
+    "lightning": "⚡", "marathon": "🏃", "necessary": "📌", "opposite": "↔️", "sentences": "📝",
+    "stressful": "😰", "thrilling": "🎢", "toothache": "🦷", "wednesday": "📅", "involving": "🔗",
+    "acquiring": "🎯", "applying": "📋", "paperless": "♻️", "terrifying": "😱",
+    "contained": "📦", "corkscrew": "🍷", "extremely": "🔥", "hopefully": "🤞", "sightseeing": "📸",
+    "throughout": "🔄", "vegetables": "🥦", "vocabulary": "📖", "girlfriend": "💑", "headphones": "🎧",
+    # MEDIUM
+    "achieving": "🏆", "apparently": "🧐", "appreciate": "💝", "belongings": "🎒", "beautifully": "🌺",
+    "businessman": "👔", "catastrophic": "💥", "championship": "🥇", "cheesecake": "🍰", "chinatown": "🏮",
+    "colleagues": "👥", "combination": "🔀", "comfortable": "😌", "commitment": "💍", "comparative": "⚖️",
+    "competition": "🏅", "completely": "💯", "conditions": "📋", "containing": "📦", "countryside": "🌾",
+    "definition": "📖", "difference": "🔄", "distraction": "📱", "earthquake": "🌋", "employment": "💼",
+    "expression": "😊", "experience": "🌟", "exhibition": "🖼️", "excitement": "🎉", "facilities": "🏗️",
+    "hardworking": "💪", "harmonious": "🎶", "housewares": "🏠", "imagination": "💭", "immigration": "🛂",
+    "importance": "❗", "indirectly": "↩️", "interesting": "🤩", "introducing": "🎤", "jewellery": "💎",
+    "kilometre": "📏", "literature": "📚", "management": "📊", "medication": "💊", "monitoring": "📡",
+    "mountainous": "⛰️", "mischievous": "😈", "modernization": "🏙️", "phenomenon": "🌠", "philosophy": "🤔",
+    "politician": "🏛️", "possessions": "🏠", "potentially": "🔮", "predictions": "🔮", "rainforest": "🌴",
+    "ridiculous": "🤣", "salesperson": "🛒", "snorkeling": "🤿", "statements": "📄", "stomachache": "🤢",
+    "strawberry": "🍓", "suggestions": "💡", "technician": "🔧", "technology": "💻", "temperature": "🌡️",
+    "university": "🎓", "unstoppable": "🚀", "windsurfing": "🏄", "workaholic": "⏰", "application": "📱",
+    "appointment": "📅", "advertising": "📺", "aeroplane": "✈️", "afterwards": "⏩", "alcoholism": "🍺",
+    "arrangements": "📋", "association": "🤝", "availability": "📆", "civilization": "🏛️", "documentary": "🎥",
+    "exploration": "🧭", "information": "ℹ️", "kitesurfing": "🪁", "linguistics": "🗣️", "paragliding": "🪂",
+    "questioning": "❓", "romanticism": "💕", "satisfaction": "😊", "screwdriver": "🪛", "significance": "⭐",
+    # HARD
+    "accomplishments": "🏆", "achievements": "🥇", "acknowledgement": "🙏", "administration": "🏢",
+    "advertisement": "📺", "appreciation": "💝", "apprehensive": "😟", "appropriate": "✅",
+    "architecture": "🏗️", "astronomical": "🔭", "communication": "📞", "comprehension": "🧠",
+    "comprehensive": "📚", "circumstances": "🔄", "consciously": "🧘", "consecutively": "🔢",
+    "consideration": "🤔", "consolidation": "🔗", "courageously": "🦁", "continuously": "♾️",
+    "dermatologist": "👨‍⚕️", "descriptions": "📝", "disappointing": "😞", "distribution": "📦",
+    "economically": "💰", "effectiveness": "📈", "encyclopedia": "📖", "engineering": "⚙️",
+    "entertainment": "🎭", "enthusiastic": "🤩", "equality": "⚖️", "examination": "📝",
+    "extraordinary": "✨", "independently": "🦅", "international": "🌐", "internationally": "🌐",
+    "interruption": "🛑", "investigation": "🔍", "neighborhood": "🏘️", "nevertheless": "🔄",
+    "overwhelming": "🌊", "participles": "📝", "possibilities": "🌈", "prescription": "💊",
+    "presentations": "📊", "refrigerator": "🧊", "relationship": "💑", "resolutions": "🎯",
+    "revolutionary": "✊", "scientifically": "🔬", "successfully": "🎉", "surprisingly": "😲",
+    "transnational": "🌍", "understandable": "💡", "understanding": "🤝", "unforgettable": "💫",
+    "hypervitaminosis": "💊", "hyperthyroidism": "🏥", "hypertension": "❤️", "mediterranean": "🌊",
+    "methodology": "📐",
+    # PHRASES
+    "food court": "🍔", "ice hockey": "🏒", "computer room": "🖥️", "movie theater": "🎬",
+    "shopping bag": "🛍️", "shopping center": "🏬", "bottle opener": "🍾", "bungee jumping": "🤸",
+    "chopping board": "🔪", "microwave oven": "📡", "household chores": "🧹", "united states": "🇺🇸",
+    "washing machine": "🧺", "weekly planner": "📅", "wooden spoon": "🥄", "admiration mark": "❗",
+}
+
+# Combined for backward compat
+WORDS = EASY_WORDS + HARD_WORDS
