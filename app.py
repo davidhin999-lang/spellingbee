@@ -76,19 +76,20 @@ def load_leaderboard():
     board = {"easy": [], "medium": [], "hard": []}
     try:
         for diff in board:
-            docs = db.collection("leaderboard").document(diff).collection("entries") \
-                .order_by("score", direction=firestore.Query.DESCENDING).limit(15).stream()
-            board[diff] = [doc.to_dict() for doc in docs]
-    except Exception:
-        pass
+            docs = db.collection("leaderboard").document(diff).collection("entries").stream()
+            entries = [doc.to_dict() for doc in docs]
+            entries.sort(key=lambda x: x.get("score", 0), reverse=True)
+            board[diff] = entries[:15]
+    except Exception as e:
+        print("Firestore load error:", e)
     return board
 
 
 def save_leaderboard_entry(difficulty, entry):
     try:
         db.collection("leaderboard").document(difficulty).collection("entries").add(entry)
-    except Exception:
-        pass
+    except Exception as e:
+        print("Firestore save error:", e)
 
 
 @app.route("/")
