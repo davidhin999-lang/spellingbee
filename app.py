@@ -5,11 +5,24 @@ import io
 import json
 import os
 import requests as http_requests
+import firebase_admin
+from firebase_admin import credentials, firestore
 from words import EASY_WORDS, MEDIUM_WORDS, HARD_WORDS, PHRASE_WORDS, WORD_IMAGES
 
 app = Flask(__name__)
 
-LEADERBOARD_FILE = os.path.join(os.path.dirname(__file__), "leaderboard.json")
+# Initialize Firebase
+firebase_creds = os.environ.get("FIREBASE_CREDENTIALS")
+if firebase_creds:
+    cred_dict = json.loads(firebase_creds)
+    cred = credentials.Certificate(cred_dict)
+else:
+    # Local development: use the JSON file
+    cred_path = os.path.join(os.path.dirname(__file__), "firebase-key.json")
+    cred = credentials.Certificate(cred_path)
+
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 VOICE_NORMAL = "en-US-JennyNeural"
 VOICE_SLOW = "en-US-JennyNeural"
@@ -60,18 +73,22 @@ def fetch_image_url(word):
 
 
 def load_leaderboard():
-    if os.path.exists(LEADERBOARD_FILE):
-        try:
-            with open(LEADERBOARD_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return {"easy": [], "medium": [], "hard": []}
-    return {"easy": [], "medium": [], "hard": []}
+    board = {"easy": [], "medium": [], "hard": []}
+    try:
+        for diff in board:
+            docs = db.collection("leaderboard").document(diff).collection("entries") \
+                .order_by("score", direction=firestore.Query.DESCENDING).limit(15).stream()
+            board[diff] = [doc.to_dict() for doc in docs]
+    except Exception:
+        pass
+    return board
 
 
-def save_leaderboard(data):
-    with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+def save_leaderboard_entry(difficulty, entry):
+    try:
+        db.collection("leaderboard").document(difficulty).collection("entries").add(entry)
+    except Exception:
+        pass
 
 
 @app.route("/")
@@ -131,12 +148,11 @@ def post_leaderboard():
     if not name or score < 0 or difficulty not in ("easy", "medium", "hard"):
         return jsonify({"ok": False}), 400
 
-    board = load_leaderboard()
     entry = {"name": name, "score": score, "streak": streak}
-    board.setdefault(difficulty, []).append(entry)
-    board[difficulty].sort(key=lambda x: x["score"], reverse=True)
-    board[difficulty] = board[difficulty][:15]
-    save_leaderboard(board)
+    save_leaderboard_entry(difficulty, entry)
+
+    # Reload the board to return updated rankings
+    board = load_leaderboard()
     return jsonify({"ok": True, "board": board[difficulty]})
 
 
