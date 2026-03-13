@@ -117,13 +117,31 @@ def home():
 
 @app.route("/words")
 def get_words():
-    difficulty = request.args.get("difficulty", "easy")
+    difficulty = request.args.get("difficulty", "easy").lower().strip()
+    
+    # Strict validation: only allow valid difficulties
+    if difficulty not in ("easy", "medium", "hard"):
+        difficulty = "easy"
+    
+    # Return only words from the requested difficulty group
     if difficulty == "hard":
-        words = HARD_WORDS + PHRASE_WORDS
+        words = list(set(HARD_WORDS + PHRASE_WORDS))  # Remove duplicates
     elif difficulty == "medium":
-        words = MEDIUM_WORDS
-    else:
-        words = EASY_WORDS
+        words = list(set(MEDIUM_WORDS))  # Remove duplicates
+    else:  # easy
+        words = list(set(EASY_WORDS))  # Remove duplicates
+    
+    # Ensure no cross-contamination between groups
+    if difficulty == "easy":
+        # Remove any medium/hard words that might have slipped in
+        words = [w for w in words if w not in MEDIUM_WORDS and w not in HARD_WORDS and w not in PHRASE_WORDS]
+    elif difficulty == "medium":
+        # Remove any easy/hard words that might have slipped in
+        words = [w for w in words if w not in EASY_WORDS and w not in HARD_WORDS and w not in PHRASE_WORDS]
+    elif difficulty == "hard":
+        # Remove any easy/medium words that might have slipped in
+        words = [w for w in words if w not in EASY_WORDS and w not in MEDIUM_WORDS]
+    
     return jsonify({"words": words})
 
 
@@ -141,14 +159,28 @@ def get_image(word):
 
 @app.route("/speak/<path:word>")
 def speak(word):
-    audio = run_async(generate_speech(word, VOICE_NORMAL, rate="+0%"))
-    return send_file(audio, mimetype="audio/mpeg")
+    # Force Edge TTS for all words - no cached robotic audio files
+    # This ensures consistent, natural-sounding pronunciation
+    try:
+        audio = run_async(generate_speech(word, VOICE_NORMAL, rate="-10%"))
+        return send_file(audio, mimetype="audio/mpeg")
+    except Exception as e:
+        print(f"TTS Error for word '{word}': {e}")
+        # Return error response instead of falling back to cached audio
+        return jsonify({"error": "TTS generation failed"}), 500
 
 
 @app.route("/speak_slow/<path:word>")
 def speak_slow(word):
-    audio = run_async(generate_speech(word, VOICE_SLOW, rate="-30%"))
-    return send_file(audio, mimetype="audio/mpeg")
+    # Force Edge TTS for all words - no cached robotic audio files
+    # Slower rate for tournament group words
+    try:
+        audio = run_async(generate_speech(word, VOICE_SLOW, rate="-45%"))
+        return send_file(audio, mimetype="audio/mpeg")
+    except Exception as e:
+        print(f"TTS Slow Error for word '{word}': {e}")
+        # Return error response instead of falling back to cached audio
+        return jsonify({"error": "TTS generation failed"}), 500
 
 
 @app.route("/leaderboard", methods=["GET"])

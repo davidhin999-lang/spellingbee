@@ -1,0 +1,48 @@
+================================================================================
+DELETE ROBOTIC TTS AUDIO FILES
+================================================================================
+
+Archivos a eliminar (audio robótico):
+- audio/banana.mp3
+- audio/communication.mp3
+- audio/computer.mp3
+- audio/dictionary.mp3
+- audio/environment.mp3
+- audio/responsibility.mp3
+- audio/school.mp3
+- audio/science.mp3
+- audio/technology.mp3
+
+Estos archivos serán reemplazados por ElevenLabs o Edge TTS en tiempo real.
+
+================================================================================
+COMANDO PARA ELIMINAR (PowerShell)
+================================================================================
+
+cd c:\Users\HP\Documents\spelling_bee
+Remove-Item audio\banana.mp3 -Force
+Remove-Item audio\communication.mp3 -Force
+Remove-Item audio\computer.mp3 -Force
+Remove-Item audio\dictionary.mp3 -Force
+Remove-Item audio\environment.mp3 -Force
+Remove-Item audio\responsibility.mp3 -Force
+Remove-Item audio\school.mp3 -Force
+Remove-Item audio\science.mp3 -Force
+Remove-Item audio\technology.mp3 -Force
+
+================================================================================
+COMANDO PARA ELIMINAR (CMD)
+================================================================================
+
+cd c:\Users\HP\Documents\spelling_bee
+del audio\banana.mp3
+del audio\communication.mp3
+del audio\computer.mp3
+del audio\dictionary.mp3
+del audio\environment.mp3
+del audio\responsibility.mp3
+del audio\school.mp3
+del audio\science.mp3
+del audio\technology.mp3
+
+================================================================================

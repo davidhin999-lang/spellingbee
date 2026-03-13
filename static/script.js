@@ -19,6 +19,10 @@ var hiddenKeys = [];
 var keyFadeTimer = null;
 var playerName = "";
 var leaderboardData = {};
+var lives = 3;
+var maxLives = 3;
+var maxHints = 3;
+var hintsLeft = 3;
 
 // Round system
 var currentRound = 1;
@@ -42,6 +46,104 @@ var DIFF_CONFIG = {
   hard:   { wordTime: 10, letterBonus: 1, penalty: 1, hint: false, fadeSpeed: 0.5 }
 };
 var skippedWords = 0;
+
+function updateLivesDisplay() {
+  var el = document.getElementById("lives-display");
+  if (!el) return;
+  var text = "";
+  for (var i = 0; i < maxLives; i++) text += i < lives ? "❤️" : "🖤";
+  el.textContent = text;
+}
+
+function updateHintButton() {
+  var btn = document.getElementById("hint-btn");
+  var icon = document.getElementById("hint-icon");
+  if (!btn || !icon) return;
+
+  icon.classList.remove("hint-dim", "hint-broken");
+  if (hintsLeft === 2 || hintsLeft === 1) icon.classList.add("hint-dim");
+  if (hintsLeft <= 0) icon.classList.add("hint-broken");
+
+  if (hintsLeft <= 0) {
+    btn.setAttribute("disabled", "true");
+  } else {
+    btn.removeAttribute("disabled");
+  }
+}
+
+function useHint() {
+  if (!gameActive || hintsLeft <= 0) return;
+
+  var boxes = document.querySelectorAll(".letter-box");
+  var targetPos = currentIndex;
+  while (targetPos < currentWord.length && currentWord[targetPos] === " ") targetPos++;
+  if (targetPos >= currentWord.length) return;
+
+  var boxIndex = 0;
+  for (var p = 0; p < targetPos; p++) {
+    if (currentWord[p] !== " ") boxIndex++;
+  }
+  var box = boxes[boxIndex];
+  if (!box) return;
+
+  hintsLeft--;
+  updateHintButton();
+
+  var letter = currentWord[targetPos];
+  box.textContent = letter;
+  box.classList.add("hint");
+  box.classList.remove("tremor");
+  sfxCorrect();
+
+  currentIndex = targetPos + 1;
+  while (currentIndex < currentWord.length && currentWord[currentIndex] === " ") currentIndex++;
+
+  // If hint finished the word, run the same completion flow as typed input
+  if (currentIndex >= currentWord.length) {
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    wordsCompleted++;
+    wordInRound++;
+
+    var timeTaken = (Date.now() - wordStartTime) / 1000;
+    var wordLen = currentWord.replace(/ /g, "").length;
+    var timeScore = Math.max(0, Math.round((maxTime - timeTaken) / maxTime * 50));
+    var accuracyScore = Math.max(0, Math.round((1 - wrongLetters / wordLen) * 50));
+    var wordScore = timeScore + accuracyScore;
+    wordScores.push({ word: currentWord, score: wordScore, time: Math.round(timeTaken * 10) / 10, errors: wrongLetters });
+    score = wordScores.reduce(function(sum, w) { return sum + w.score; }, 0);
+    updateScore();
+    updateStreak();
+    updateRoundIndicator();
+
+    sfxComplete();
+    if (streak >= 3) { sfxStreak(); launchConfetti(30 + streak * 5); }
+
+    gameActive = false;
+    clearInterval(timer);
+    for (var i = 0; i < boxes.length; i++) {
+      (function(b, delay) { setTimeout(function() { b.classList.add("celebrate"); }, delay); })(boxes[i], i * 60);
+    }
+
+    if (wordInRound >= wordsPerRound) {
+      if (currentRound >= totalRounds) {
+        setTimeout(function() { endGame(); }, 1000);
+        return;
+      }
+      setTimeout(function() {
+        showRoundTransition(function() {
+          currentRound++;
+          wordInRound = 0;
+          timeLeft = maxTime;
+          updateRoundIndicator();
+          nextWord();
+        });
+      }, 800);
+    } else {
+      setTimeout(function() { nextWord(); }, 800);
+    }
+  }
+}
 
 // ==================== SOUND EFFECTS (Web Audio API) ====================
 var audioCtx = null;
@@ -216,12 +318,12 @@ function setAtmosphere(difficulty) {
 
   if (difficulty === "easy") {
     // Clouds built from many small round puffs (like confetti particles)
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 4; i++) {
       var cx = Math.random() * W;
       var cy = 30 + Math.random() * (H * 0.55);
       var spd = 0.15 + Math.random() * 0.15;
       // Each cloud = 15-25 overlapping round circles
-      var n = 15 + Math.floor(Math.random() * 11);
+      var n = 10 + Math.floor(Math.random() * 8);
       for (var p = 0; p < n; p++) {
         atmoParticles.push({
           x: cx + (Math.random() - 0.5) * 160,
@@ -236,7 +338,7 @@ function setAtmosphere(difficulty) {
     }
   } else if (difficulty === "medium") {
     // Embers rising
-    for (var k = 0; k < 35; k++) {
+    for (var k = 0; k < 22; k++) {
       atmoParticles.push({
         type: "ember",
         x: Math.random() * W,
@@ -250,7 +352,7 @@ function setAtmosphere(difficulty) {
     }
   } else if (difficulty === "hard") {
     // Flame particles — same simple model as clouds: position + velocity
-    for (var j = 0; j < 80; j++) {
+    for (var j = 0; j < 42; j++) {
       atmoParticles.push({
         x: Math.random() * W,
         y: H - Math.random() * H * 0.5,
@@ -457,7 +559,7 @@ function startKeyFading() {
   var lettersToHide = shuffleArray(getLettersNotInWord(currentWord));
   var fadeIndex = 0;
   var totalToHide = lettersToHide.length;
-  var fadeInterval = Math.max(800, Math.floor((config.time * 1000 * config.fadeSpeed) / (totalToHide + 2)));
+  var fadeInterval = Math.max(800, Math.floor((config.wordTime * 1000 * config.fadeSpeed) / (totalToHide + 2)));
 
   keyFadeTimer = setInterval(function() {
     if (!gameActive || fadeIndex >= totalToHide) { clearInterval(keyFadeTimer); return; }
@@ -497,9 +599,13 @@ function startGame(difficulty) {
   wordInRound = 0;
   wrongLetters = 0;
   wordScores = [];
+  lives = maxLives;
+  hintsLeft = maxHints;
   updateScore();
   updateStreak();
   updateRoundIndicator();
+  updateLivesDisplay();
+  updateHintButton();
 
   var badge = document.getElementById("difficulty-badge");
   badge.textContent = difficulty.toUpperCase();
@@ -797,8 +903,6 @@ function renderBoxes(word) {
   container.innerHTML = "";
   currentIndex = 0;
 
-  var config = DIFF_CONFIG[currentDifficulty] || DIFF_CONFIG.easy;
-
   for (var i = 0; i < word.length; i++) {
     if (word[i] === " ") {
       var spacer = document.createElement("div");
@@ -811,23 +915,17 @@ function renderBoxes(word) {
     box.className = "letter-box";
     box.setAttribute("data-pos", i);
 
-    if (i === 0 && config.hint) {
-      box.textContent = word[0];
-      box.classList.add("hint");
-    }
-
     box.style.animationDelay = (i * 0.05) + "s";
     box.classList.add("box-enter");
     // Hard mode: unfilled boxes tremble
-    if (currentDifficulty === "hard" && !(i === 0 && config.hint)) {
+    if (currentDifficulty === "hard") {
       box.classList.add("tremor");
     }
     container.appendChild(box);
   }
 
-  // Skip spaces and hint letter
+  // Skip spaces
   currentIndex = 0;
-  if (config.hint) currentIndex = 1;
   while (currentIndex < word.length && word[currentIndex] === " ") currentIndex++;
 }
 
@@ -963,7 +1061,11 @@ function handleLetter(letter) {
       timeLeft = Math.max(0, timeLeft - config.penalty);
       showPenalty("-" + config.penalty + "s");
       sfxPenalty();
-      if (timeLeft <= 0) { clearInterval(timer); endGame(); }
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        skipWord();
+        return;
+      }
     }
 
     // Screen shake on hard mode
@@ -980,6 +1082,8 @@ function nextWord() {
   renderBoxes(word);
   updateRefImage(word);
   audioPlayCount = 0;
+  hintsLeft = maxHints;
+  updateHintButton();
   resetKeyboardVisibility();
   startKeyFading();
   playAudio();
@@ -1118,7 +1222,14 @@ function skipWord() {
 
   showPenalty("TIME'S UP!");
 
+  lives = Math.max(0, lives - 1);
+  updateLivesDisplay();
   gameActive = false;
+
+  if (lives <= 0) {
+    setTimeout(function() { endGame(); }, 1200);
+    return;
+  }
 
   // Check if round is done
   if (wordInRound >= wordsPerRound) {

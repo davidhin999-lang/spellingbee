@@ -8,3 +8,13 @@ venv/
 .DS_Store
 Thumbs.db
 firebase-key.json
+# Robotic TTS audio files - replaced by dynamic Edge TTS
+audio/banana.mp3
+audio/communication.mp3
+audio/computer.mp3
+audio/dictionary.mp3
+audio/environment.mp3
+audio/responsibility.mp3
+audio/school.mp3
+audio/science.mp3
+audio/technology.mp3

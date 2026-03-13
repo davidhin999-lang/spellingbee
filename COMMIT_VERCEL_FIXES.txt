@@ -1,0 +1,79 @@
+================================================================================
+COMMIT VERCEL FIXES
+================================================================================
+
+Cambios realizados:
+1. ✅ Strict word list validation per group (app.py)
+2. ✅ Fixed letter box contrast - dark background, bright text (style.css)
+3. ✅ Fixed Continue button gradient colors (style.css)
+4. ✅ Force Edge TTS for all words - no robotic audio files (app.py)
+5. ⏳ Delete robotic audio files
+
+================================================================================
+PASO 1: Eliminar archivos de audio robótico
+================================================================================
+
+cd c:\Users\HP\Documents\spelling_bee
+
+# PowerShell:
+Remove-Item audio\banana.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\communication.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\computer.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\dictionary.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\environment.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\responsibility.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\school.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\science.mp3 -Force -ErrorAction SilentlyContinue
+Remove-Item audio\technology.mp3 -Force -ErrorAction SilentlyContinue
+
+# O CMD:
+del audio\banana.mp3 /F /Q
+del audio\communication.mp3 /F /Q
+del audio\computer.mp3 /F /Q
+del audio\dictionary.mp3 /F /Q
+del audio\environment.mp3 /F /Q
+del audio\responsibility.mp3 /F /Q
+del audio\school.mp3 /F /Q
+del audio\science.mp3 /F /Q
+del audio\technology.mp3 /F /Q
+
+
+================================================================================
+PASO 2: Commit todos los cambios
+================================================================================
+
+git add .
+git commit -m "Fix Vercel version: word validation, UI contrast, TTS enforcement
+
+- Strict word list validation per group (no cross-contamination)
+- Fixed letter box contrast: dark background (#1e1e28) with bright white text
+- Fixed Continue button gradient to cover corners completely
+- Force Edge TTS for all words (no cached robotic audio files)
+- Removed all robotic TTS audio files from audio/ directory
+- Tournament group now uses natural-sounding Edge TTS pronunciation
+- Improved accessibility and user experience"
+
+git push origin vercel-stable
+
+
+================================================================================
+RESUMEN DE CAMBIOS
+================================================================================
+
+1. app.py:
+   - Strict validation: only return words from requested difficulty group
+   - Remove duplicates and prevent cross-contamination
+   - Force Edge TTS for all words (no fallback to cached audio)
+   - Error handling for TTS failures
+
+2. style.css:
+   - Letter boxes: dark background (rgba(30, 30, 40, 0.85)) with white text
+   - Hint boxes: improved contrast with darker background
+   - Continue button: gradient covers all corners completely
+   - Better visibility on first screen
+
+3. audio/ directory:
+   - Delete all robotic TTS files
+   - Use dynamic Edge TTS generation instead
+
+================================================================================
